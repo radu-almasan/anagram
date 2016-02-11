@@ -1,4 +1,4 @@
-package com.radualmasan.anagram;
+package com.radualmasan.anagram.output;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -7,8 +7,6 @@ import java.nio.file.Path;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
-
-import com.radualmasan.anagram.output.Writer;
 
 /**
  * @author almasan.radu@gmail.com

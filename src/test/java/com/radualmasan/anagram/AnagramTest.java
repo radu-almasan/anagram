@@ -23,6 +23,7 @@ import org.mockito.internal.matchers.ArrayEquals;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import com.radualmasan.anagram.input.ScannerReader;
+import com.radualmasan.anagram.output.FileWriter;
 import com.radualmasan.anagram.strategy.AnagramStrategy;
 
 /**

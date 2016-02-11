@@ -9,6 +9,7 @@ import java.nio.file.Paths;
 
 import com.radualmasan.anagram.input.Reader;
 import com.radualmasan.anagram.input.ScannerReader;
+import com.radualmasan.anagram.output.FileWriter;
 import com.radualmasan.anagram.strategy.AnagramStrategy;
 import com.radualmasan.anagram.strategy.MapBasedAnagramStrategy;
 
