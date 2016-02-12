@@ -11,7 +11,7 @@ import com.radualmasan.anagram.input.Reader;
 import com.radualmasan.anagram.input.ScannerReader;
 import com.radualmasan.anagram.output.FileWriter;
 import com.radualmasan.anagram.strategy.AnagramStrategy;
-import com.radualmasan.anagram.strategy.MapBasedAnagramStrategy;
+import com.radualmasan.anagram.strategy.DbAnagramStrategy;
 
 /**
  * @author almasan.radu@gmail.com
@@ -30,8 +30,6 @@ public class Anagram {
         new Anagram(args).run();
     }
 
-    /** The anagram strategy used. */
-    private final AnagramStrategy anagramStrategy = new MapBasedAnagramStrategy();
     /** The input file path. */
     private final Path inputFilePath;
     /** The output file path. */
@@ -50,6 +48,14 @@ public class Anagram {
 
         inputFilePath = Paths.get(pathNames[0]);
         outputFilePath = Paths.get(pathNames[1]);
+    }
+
+    /**
+     *
+     * @return a new anagram strategy
+     */
+    AnagramStrategy newAnagramStrategy() {
+        return new DbAnagramStrategy();
     }
 
     /**
@@ -73,12 +79,13 @@ public class Anagram {
     }
 
     public void run() {
-        try (final Reader reader = newReader(inputFilePath)) {
+        try (final Reader reader = newReader(inputFilePath); AnagramStrategy anagramStrategy = newAnagramStrategy()) {
             while (reader.hasNext()) {
                 anagramStrategy.ingest(reader.next());
             }
             newWriter(outputFilePath).write(anagramStrategy.getAnagramPairs());
-        } catch (final IOException e) {
+
+        } catch (final Exception e) {
             throw new RuntimeException(e);
         }
     }

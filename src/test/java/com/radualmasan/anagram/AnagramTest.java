@@ -5,7 +5,6 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.powermock.reflect.Whitebox.setInternalState;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -32,73 +31,76 @@ import com.radualmasan.anagram.strategy.AnagramStrategy;
 @RunWith(MockitoJUnitRunner.class)
 public class AnagramTest {
 
-	/** Input file path name. */
-	private static final String INPUT_FILE_PATH_NAME = "C:\\in.txt";
-	/** Output file path name. */
-	private static final String OUTPUT_FILE_PATH_NAME = "C:\\out.txt";
+    /** Input file path name. */
+    private static final String INPUT_FILE_PATH_NAME = "C:\\in.txt";
+    /** Output file path name. */
+    private static final String OUTPUT_FILE_PATH_NAME = "C:\\out.txt";
 
-	/** The tested anagram. */
-	private Anagram anagram;
-	/** Anagram pairs. */
-	@Mock
-	private Stream<Set<String>> anagramPairs;
-	/** The anagram strategy. */
-	@Mock
-	private AnagramStrategy anagramStrategy;
-	/** The reader. */
-	@Mock
-	private ScannerReader reader;
-	/** The writer. */
-	@Mock
-	private FileWriter writer;
+    /** The tested anagram. */
+    private Anagram anagram;
+    /** Anagram pairs. */
+    @Mock
+    private Stream<Set<String>> anagramPairs;
+    /** The anagram strategy. */
+    @Mock
+    private AnagramStrategy anagramStrategy;
+    /** The reader. */
+    @Mock
+    private ScannerReader reader;
+    /** The writer. */
+    @Mock
+    private FileWriter writer;
 
-	/**
-	 * Set up test case.
-	 */
-	@Before
-	public void init() {
-		anagram = new Anagram(new String[] { INPUT_FILE_PATH_NAME, OUTPUT_FILE_PATH_NAME }) {
-			@Override
-			ScannerReader newReader(Path inputFilePath) throws IOException {
-				return reader;
-			}
+    /**
+     * Set up test case.
+     */
+    @Before
+    public void init() {
+        anagram = new Anagram(new String[] { INPUT_FILE_PATH_NAME, OUTPUT_FILE_PATH_NAME }) {
+            @Override
+            AnagramStrategy newAnagramStrategy() {
+                return anagramStrategy;
+            }
 
-			@Override
-			FileWriter newWriter(Path outputFilePath) {
-				return writer;
-			}
-		};
+            @Override
+            ScannerReader newReader(Path inputFilePath) throws IOException {
+                return reader;
+            }
 
-		setInternalState(anagram, anagramStrategy);
-	}
+            @Override
+            FileWriter newWriter(Path outputFilePath) {
+                return writer;
+            }
+        };
+    }
 
-	@Test(expected = IllegalArgumentException.class)
-	public void testNewEmptyInut() throws Exception {
-		new Anagram(new String[0]);
-	}
+    @Test(expected = IllegalArgumentException.class)
+    public void testNewEmptyInut() throws Exception {
+        new Anagram(new String[0]);
+    }
 
-	@Test(expected = NullPointerException.class)
-	public void testNewNullInput() {
-		new Anagram((String[]) null);
-	}
+    @Test(expected = NullPointerException.class)
+    public void testNewNullInput() {
+        new Anagram((String[]) null);
+    }
 
-	@Test
-	public void testRun() throws Exception {
-		final String[] readWords = { "from", "test", "form" };
-		when(reader.hasNext()).thenReturn(true, true, true, false);
-		when(reader.next()).thenReturn(readWords[0], Arrays.copyOfRange(readWords, 1, readWords.length));
+    @Test
+    public void testRun() throws Exception {
+        final String[] readWords = { "from", "test", "form" };
+        when(reader.hasNext()).thenReturn(true, true, true, false);
+        when(reader.next()).thenReturn(readWords[0], Arrays.copyOfRange(readWords, 1, readWords.length));
 
-		when(anagramStrategy.getAnagramPairs()).thenReturn(anagramPairs);
+        when(anagramStrategy.getAnagramPairs()).thenReturn(anagramPairs);
 
-		anagram.run();
+        anagram.run();
 
-		final ArgumentCaptor<String> stringCaptor = ArgumentCaptor.forClass(String.class);
-		verify(anagramStrategy, times(3)).ingest(stringCaptor.capture());
+        final ArgumentCaptor<String> stringCaptor = ArgumentCaptor.forClass(String.class);
+        verify(anagramStrategy, times(3)).ingest(stringCaptor.capture());
 
-		final List<String> ingestedWords = stringCaptor.getAllValues();
-		assertEquals(3, ingestedWords.size());
-		assertThat(ingestedWords.toArray(new String[ingestedWords.size()]), new ArrayEquals(readWords));
+        final List<String> ingestedWords = stringCaptor.getAllValues();
+        assertEquals(3, ingestedWords.size());
+        assertThat(ingestedWords.toArray(new String[ingestedWords.size()]), new ArrayEquals(readWords));
 
-		verify(writer).write(anagramPairs);
-	}
+        verify(writer).write(anagramPairs);
+    }
 }

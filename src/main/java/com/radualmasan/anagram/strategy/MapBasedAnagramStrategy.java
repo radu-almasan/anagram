@@ -1,6 +1,5 @@
 package com.radualmasan.anagram.strategy;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -17,6 +16,11 @@ public class MapBasedAnagramStrategy implements AnagramStrategy {
 
     /** Computed and sorted data. */
     private final Map<Integer, Map<Integer, Map<String, Set<String>>>> data = new HashMap<>();
+
+    @Override
+    public void close() {
+        data.clear();
+    }
 
     @Override
     public Stream<Set<String>> getAnagramPairs() {
@@ -39,11 +43,7 @@ public class MapBasedAnagramStrategy implements AnagramStrategy {
         final int sum = IntStream.range(0, length).map(i -> bytes[i]).parallel().reduce(0, (a, b) -> a + b);
         final Map<String, Set<String>> dataByCharSum = dataByLength.computeIfAbsent(sum, k -> new HashMap<>());
 
-        final char[] chars = word.toCharArray();
-        Arrays.sort(chars);
-        final String sortedWord = new String(chars);
-
-        dataByCharSum.compute(sortedWord, (k, v) -> {
+        dataByCharSum.compute(getSortedChars(word), (k, v) -> {
             v = v != null ? v : new LinkedHashSet<>();
             v.add(word);
             return v;
